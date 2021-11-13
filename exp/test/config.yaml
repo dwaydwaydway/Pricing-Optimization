@@ -13,13 +13,13 @@ data:
 strategy: BaseStrategy
 
 preprocess:
-  preprocessor: 'KNN_Preprocessor'
+  preprocessor: KNN_Preprocessor
   param:
     n_neighbors: 5
 
 optimize:
   price_range: []
   fold: 5
-  model: 'Logistic_Regression'
+  model: Logistic_Regression
   param:
     max_iter: 100
