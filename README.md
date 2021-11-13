@@ -21,4 +21,5 @@ python src/main.py -c config.yaml
 After running the script, a folder with the name of the 'exp_name' you define in ```config.yaml``` will be automatically created inside ```exp/```. A copy of the ```config.yaml``` you run with and the experiment result will be in it.
 
 ## TODO
+Figure out what the hell am I doing here (X)
 Write the scripts that generated our final predictions
