@@ -1,0 +1,5 @@
+{"Fold 0": {"Cross Entropy For item0": 0.17872509878771758, "Cross Entropy For item1": 0.13801224309989518}}
+{"Fold 1": {"Cross Entropy For item0": 0.19000162994985434, "Cross Entropy For item1": 0.1426004222634093}}
+{"Fold 2": {"Cross Entropy For item0": 0.1724359688959916, "Cross Entropy For item1": 0.15765511833118348}}
+{"Fold 3": {"Cross Entropy For item0": 0.17419829817758115, "Cross Entropy For item1": 0.14099885967987344}}
+{"Fold 4": {"Cross Entropy For item0": 0.17367205830664822, "Cross Entropy For item1": 0.1542011318318313}}
