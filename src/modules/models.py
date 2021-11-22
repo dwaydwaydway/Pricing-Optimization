@@ -1,4 +1,6 @@
+import numpy as np
 from sklearn.linear_model import LogisticRegression
+from modules.custom_model import OneVsRestLightGBMWithCustomizedLoss, FocalLoss
 
 class Models:
     def __init__(self, param):
@@ -8,8 +10,8 @@ class Models:
     def fit(self, *args, **kwargs):
         raise NotImplementedError(f"fit function not implemented for {self.__class__.__name__}")
 
-    def prices2demand(self, *args, **kwargs):
-        raise NotImplementedError(f"prices2demand function not implemented for {self.__class__.__name__}")
+    def predict_prob(self, *args, **kwargs):
+        raise NotImplementedError(f"predict_prob function not implemented for {self.__class__.__name__}")
 
 class Logistic_Regression(Models):
     def __init__(self, param):
@@ -21,3 +23,16 @@ class Logistic_Regression(Models):
     
     def prices2demand(self, data):
         return self.model_0.predict_proba(data['X'])[:, 1], self.model_1.predict_proba(data['X'])[:, 1]
+
+class lightGBM_FocalLoss(Models):
+    def __init__(self, param):
+        super().__init__(param)
+        # Instantiate Focal loss
+        self.loss = FocalLoss(alpha=self.alpha, gamma=self.gamma)
+
+    def fit(self, data):
+        self.model = OneVsRestLightGBMWithCustomizedLoss(loss=self.loss, n_jobs=self.n_process)
+        self.model.fit(data['X'], data['Y'])
+    
+    def predict_proba(self, data):
+        return self.model.predict_proba(data['X'])

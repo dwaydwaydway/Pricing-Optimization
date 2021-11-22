@@ -1,7 +1,7 @@
 import logging
 
 
-console_fmt = "[%(asctime)s] [%(name)5s] %(message)s"
+console_fmt = "[%(asctime)s] [%(name)10s] %(message)s"
 file_fmt = "%(message)s"
 date_fmt = '%Y-%m-%d %H:%M:%S'
 

@@ -41,15 +41,20 @@ def main(config_path):
     logger.info('[*] Start training...')
     strategy = getattr(strategies, config.strategy)(
             config=config
-    )
-    
-    log = strategy.train()
+    )    
+    train_log = strategy.train()
+
+    logger.info('[*] Start Validating...')
+    valid_log = strategy.valid()
 
     with open(exp_path / "log.json", 'w') as f:
-        for item in log:
-            f.write(json.dumps(item) + "\n")
+        f.write(json.dumps({'Training Log': train_log}, indent=4) + "\n")
+        f.write(json.dumps({'Validation Log': valid_log}, indent=4) + "\n")
+            
+    logger.info(f'[+] Experiment log dumped at {exp_path / "log.json"}')
 
-    
+    logger.info('[*] Start Testing...')
+    # strategy.test()
 
 if __name__ == "__main__":
     with ipdb.launch_ipdb_on_exception():
