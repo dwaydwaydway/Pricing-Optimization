@@ -1,4 +1,5 @@
 import numpy as np
+import pickle as pkl
 import argparse
 import subprocess
 import random
@@ -6,9 +7,10 @@ import sys
 import ipdb
 import json
 import warnings
-
-from box import Box
 from pathlib import Path
+
+import optuna.integration.lightgbm as lgb
+from box import Box
 
 from modules.logger import create_logger
 from modules import strategies
@@ -41,21 +43,25 @@ def main(config_path):
         exp_path.mkdir(parents=True)
     subprocess.call(['cp', config_path, exp_path / "config.yaml"])
 
-    logger.info('[*] Start training...')
+    model_path = \
+        Path(config.model_dir) / config.model_name
+    if not model_path.is_dir():
+        model_path.mkdir(parents=True)
+
+    logger.info(f'[+] Model loaded from {model_path / "model"}')
+    with open(model_path / 'model', 'rb') as handle:
+        model = pkl.load(handle)
     strategy = getattr(strategies, config.strategy)(
-            config=config
-    )    
-    train_log = strategy.train()
-
-    logger.info('[*] Start Validating...')
-    valid_log = strategy.valid()
-
+        config=config,
+        model=model
+    )
+    
     logger.info('[*] Start Testing...')
     output, test_log = strategy.test()
     output.to_csv(exp_path / "prediction.csv")
     
     with open(exp_path / "log.json", 'w') as f:
-        log = {'Training Log': train_log, 'Validation Log': valid_log, 'Testing Log': test_log}
+        log = {'Testing Log': test_log}
         f.write(json.dumps(log, indent=4) + "\n")
 
     logger.info(f'[+] Experiment log dumped at {exp_path / "log.json"}')

@@ -1,10 +1,10 @@
 random_seed: 42
 data_dir: '../data/'
 exp_dir: '../exp/'
-exp_name: 'get optuna model'
+exp_name: 'RandomSearchPricer_soft'
 model_dir: '../trained_model/'
 model_name: optuna_lightgbm
-reuse_model: False
+reuse_model: True
 
 data:
   train:
@@ -42,10 +42,9 @@ train:
     boosting_type: gbdt
 
 valid:
-  pricer: BestStepPricer
+  pricer: RandomSearchPricer
   param:
-    metric: 'hard' # 'hard', 'soft', 'penalized'
-    alpha: 1
+    metric: 'soft' # 'hard', 'soft', 'penalized'
     max_epoch: 30
     price0:
       min: 0.0000415

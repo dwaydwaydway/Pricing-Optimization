@@ -1,9 +1,10 @@
 import numpy as np
+
+import optuna.integration.lightgbm as lgb
 from joblib import Parallel, delayed
 from sklearn.multiclass import _ConstantPredictor
 from sklearn.preprocessing import LabelBinarizer
 from scipy import special
-import lightgbm as lgb
 from scipy import optimize
 
 
@@ -91,6 +92,8 @@ class OneVsRestLightGBMWithCustomizedLoss:
             y[:, i] = special.expit(margins + init_score)
         y /= np.sum(y, axis=1)[:, np.newaxis]
         return y
+    
+    
 
 
 class FocalLoss:

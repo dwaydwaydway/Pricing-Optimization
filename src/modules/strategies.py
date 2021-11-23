@@ -54,8 +54,10 @@ class Strategy:
         raise NotImplementedError(f"test function not implemented for {self.__class__.__name__}")
 
 class BaseStrategy(Strategy):
-    def __init__(self, config):
+    def __init__(self, config, model=None):
         super().__init__(config)
+        if model:
+            self.model = model
 
     def train(self):
         self.logger.info(f'[*] Performaing {self.config.train.fold} fold Evaluation')
@@ -81,7 +83,6 @@ class BaseStrategy(Strategy):
                 'X': self.train_data['X'][test_index], 
                 'Y': self.train_data['Y'][test_index]
             }
-
             self.model.fit(big_fold, self.config.train.fit_params)
 
             train_proba = self.model.predict_proba(big_fold)
@@ -93,13 +94,16 @@ class BaseStrategy(Strategy):
 
             eval_bar.write(utils.getTimeStr() + '     TRAIN' + ''.join(f"{key:>10.3f}" for key in [i, train_nllLoss, train_acc]))
             eval_bar.write(utils.getTimeStr() + '     VALID' + ''.join(f"{key:>10.3f}" for key in [i, valid_nllLoss, valid_acc]))
-            log[f"Fold {i}"] = {'Train':
-                                    {'Negative Log Likelihood': train_nllLoss, \
-                                    'Accuracy': train_acc},
-                               'Valid':
-                                    {'Negative Log Likelihood': valid_nllLoss, \
-                                    'Accuracy': valid_acc}
-                            }
+            log[f"Fold {i}"] = {
+                'Train':{
+                    'Negative Log Likelihood': train_nllLoss, \
+                    'Accuracy': train_acc
+                },
+                'Valid':{
+                    'Negative Log Likelihood': valid_nllLoss, \
+                    'Accuracy': valid_acc
+                }
+            }
         end_time = time.time()
 
         self.logger.info(f'[*] Training with all data')
@@ -107,7 +111,7 @@ class BaseStrategy(Strategy):
 
         log['Time'] = end_time - start_time
 
-        return log
+        return self.model, log
 
     def valid(self):
         provided_revenue = 0
@@ -123,30 +127,42 @@ class BaseStrategy(Strategy):
             param=self.config.valid.param
         )
         start_time = time.time()
-        expected_revenue, predicted_prices = self.pricer.run(self.model, self.valid_data)            
+        predicted_prices, expected_hard_revenue, expected_soft_revenue, expected_penalized_revenue = self.pricer.run(self.model, self.valid_data)            
         end_time = time.time()
 
-        self.logger.info(f'[-] [VALID] Expected Average Revenue: {sum(expected_revenue) / len(expected_revenue):2.3f}')
+        self.logger.info(f'[-] [VALID] Expected Average Hard Revenue: {sum(expected_hard_revenue) / len(expected_hard_revenue):2.3f}')
+        self.logger.info(f'[-] [VALID] Expected Average Soft Revenue: {sum(expected_soft_revenue) / len(expected_soft_revenue):2.3f}')
+        self.logger.info(f'[-] [VALID] Expected Average Penalized Revenue: {sum(expected_penalized_revenue) / len(expected_penalized_revenue):2.3f}')
 
         return {'Average Revenue Provided': provided_revenue / len(self.valid_data["X"]), 
-                'Expected Average Revenue': sum(expected_revenue) / len(expected_revenue), 
+                'Expected Average Hard Revenue': sum(expected_hard_revenue) / len(expected_hard_revenue), 
+                'Expected Average Soft Revenue': sum(expected_soft_revenue) / len(expected_soft_revenue), 
+                'Expected Average Penalized Revenue': sum(expected_penalized_revenue) / len(expected_penalized_revenue), 
                 'Time': end_time - start_time}
 
     def test(self):
+        self.pricer = getattr(pricers, self.config.valid.pricer)(
+            param=self.config.valid.param
+        )
         start_time = time.time()
-        expected_revenue, predicted_prices = self.pricer.run(self.model, self.test_data)
+        predicted_prices, expected_hard_revenue, expected_soft_revenue, expected_penalized_revenue = self.pricer.run(self.model, self.test_data)
         end_time = time.time()
 
         output = {'user_index': list(range(14000, 14000+2912)), 
                   'price_item_0': np.array([price[0] for price in predicted_prices], dtype=np.float32), 
                   'price_item_1': np.array([price[1] for price in predicted_prices], dtype=np.float32), 
-                  'expected_revenue': np.array(expected_revenue, dtype=np.float32)
+                  'expected_revenue': np.array(expected_soft_revenue, dtype=np.float32)
         }
 
-        self.logger.info(f'[-] [TEST] Expected Average Revenue: {sum(expected_revenue) / len(expected_revenue):2.3f}')
+        self.logger.info(f'[-] [TEST] Expected Average Hard Revenue: {sum(expected_hard_revenue) / len(expected_hard_revenue):2.3f}')
+        self.logger.info(f'[-] [TEST] Expected Average Soft Revenue: {sum(expected_soft_revenue) / len(expected_soft_revenue):2.3f}')
+        self.logger.info(f'[-] [TEST] Expected Average Penalized Revenue: {sum(expected_penalized_revenue) / len(expected_penalized_revenue):2.3f}')
+
 
         output = pd.DataFrame(output)
-        return output, {'Expected Average Revenue': sum(expected_revenue) / len(expected_revenue), 
+        return output, {'Expected Average Hard Revenue': sum(expected_hard_revenue) / len(expected_hard_revenue), 
+                        'Expected Average Soft Revenue': sum(expected_soft_revenue) / len(expected_soft_revenue), 
+                        'Expected Average Penalized Revenue': sum(expected_penalized_revenue) / len(expected_penalized_revenue), 
                         'Time': end_time - start_time}
 
     
