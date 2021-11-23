@@ -10,11 +10,22 @@ conda create --name <env_name> --file requirements.txt
 conda activate <env_name>
 ```
 ## Usage
+### Prepeocess Data
 ```python=
 python src/preprocess.py -c config.yaml
-python src/main.py -c config.yaml
 ```
-## Code
+### Train a Model for Classification
+```python=
+python src/train_model.py -c config.yaml
+```
+### Evaluate Pricing
+```python=
+python src/pricing.py -c config.yaml
+```
+or you can put all the congiuration files(all the experiments) in the ```exp2run/``` folder, and run
+```python=
+bash src/run_exps.sh
+``` 
 ### Everything can be configured in ```config.yaml```
 
 To experiment with new solutions, add a new class in ```preprocessors.py```, ```strategies.py```, ```models.py``` or ```pricer.py```
@@ -24,14 +35,8 @@ To experiment with new solutions, add a new class in ```preprocessors.py```, ```
  - A model class should define how the predictions are made
  - A pricer class should define how the to acquire the prices that optimize the revenue
 
-After you define your strategy/preprocessor/model, change the name of those modules in ```config.yaml``` and run with that configuration file
-```python=
-python src/preprocess.py -c config.yaml
-python src/main.py -c config.yaml
-```
-
 ## Experiment
-After running the script, a folder with the name of the 'exp_name' you define in ```config.yaml``` will be automatically created inside ```exp/```. A copy of the ```config.yaml``` you run with and the experiment result will be in it.
+After running the script, a folder with the name of the ```exp_name``` you define in ```config.yaml``` will be automatically created inside ```exp/```. A copy of the ```config.yaml``` you run with and the experiment result will be in it.
 
 # TODO
  - Experiment with different model

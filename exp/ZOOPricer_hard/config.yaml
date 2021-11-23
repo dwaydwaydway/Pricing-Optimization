@@ -1,7 +1,10 @@
 random_seed: 42
-exp_dir: '../exp/'
 data_dir: '../data/'
-exp_name: 'ZOO'
+exp_dir: '../exp/'
+exp_name: 'ZOOPricer_hard'
+model_dir: '../trained_model/'
+model_name: optuna_lightgbm
+reuse_model: True
 
 data:
   train:
@@ -32,24 +35,33 @@ train:
     alpha: 0.75
     gamma: 2
   fit_params:
+    metric: focal_loss
+    verbosity: -1
     num_leaves: 70
     n_estimators: 180
-    boosting_type: dart
+    boosting_type: gbdt
 
 valid:
   pricer: ZOOPricer
   param:
-    # step: 0.2
-    # lambda_: 0.95
-    lr: 0.1
-    epsilon: 0.0001
-    beta1: 0.9
-    beta2: 0.999
+    metric: 'hard' # 'hard', 'soft', 'penalized'
     max_epoch: 30
-    n_search: 100
     price0:
       min: 0.0000415
       max: 2.2222
     price1:
       min: 0.00024
       max: 3.99964
+
+    # BestStepPricer parameters
+    step: 0.2
+    lambda_: 0.95
+
+    # ZOOPricer parameters
+    lr: 0.1
+    epsilon: 0.0001
+    beta1: 0.9
+    beta2: 0.999
+
+    # RandomSearchPricer parameters    
+    n_search: 100

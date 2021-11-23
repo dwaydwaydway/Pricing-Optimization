@@ -1,0 +1,61 @@
+{
+    "Traning Log": {
+        "Fold 0": {
+            "Train": {
+                "Negative Log Likelihood": 0.4685965861652116,
+                "Accuracy": 0.9186974789915966
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.4968395731836811,
+                "Accuracy": 0.8823529411764706
+            }
+        },
+        "Fold 1": {
+            "Train": {
+                "Negative Log Likelihood": 0.4805003289571974,
+                "Accuracy": 0.9243697478991597
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.5115008948188744,
+                "Accuracy": 0.8802521008403361
+            }
+        },
+        "Fold 2": {
+            "Train": {
+                "Negative Log Likelihood": 0.48157289087541794,
+                "Accuracy": 0.9212184873949579
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.5225938170235986,
+                "Accuracy": 0.8701680672268908
+            }
+        },
+        "Fold 3": {
+            "Train": {
+                "Negative Log Likelihood": 0.5012696001626435,
+                "Accuracy": 0.9204831932773109
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.5387424068163768,
+                "Accuracy": 0.8726890756302521
+            }
+        },
+        "Fold 4": {
+            "Train": {
+                "Negative Log Likelihood": 0.46963059830294496,
+                "Accuracy": 0.9203781512605042
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.5150769049523233,
+                "Accuracy": 0.8516806722689075
+            }
+        },
+        "Time": 1343.5741248130798
+    },
+    "Validation Log": {
+        "Average Revenue Provided": 0.6156153108090089,
+        "Expected Average Revenue": 0.8382761677217209,
+        "Expected Average Penalized Revenue": 30.740660213168812,
+        "Time": 129.8559694290161
+    }
+}

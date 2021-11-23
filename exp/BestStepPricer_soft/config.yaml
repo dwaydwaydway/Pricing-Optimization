@@ -1,7 +1,10 @@
 random_seed: 42
-exp_dir: '../exp/'
 data_dir: '../data/'
-exp_name: 'Random'
+exp_dir: '../exp/'
+exp_name: 'BestStepPricer_soft'
+model_dir: '../trained_model/'
+model_name: optuna_lightgbm
+reuse_model: True
 
 data:
   train:
@@ -32,22 +35,33 @@ train:
     alpha: 0.75
     gamma: 2
   fit_params:
+    metric: focal_loss
+    verbosity: -1
     num_leaves: 70
     n_estimators: 180
-    boosting_type: dart
+    boosting_type: gbdt
 
 valid:
-  pricer: RandomPricer
+  pricer: BestStepPricer
   param:
-    # step: 0.2
-    # lambda_: 0.95
-    lr: 0.01
-    epsilon: 0.001
-    max_epoch: 50
-    n_search: 100
+    metric: 'soft' # 'hard', 'soft', 'penalized'
+    max_epoch: 30
     price0:
       min: 0.0000415
       max: 2.2222
     price1:
       min: 0.00024
       max: 3.99964
+
+    # BestStepPricer parameters
+    step: 0.2
+    lambda_: 0.95
+
+    # ZOOPricer parameters
+    lr: 0.1
+    epsilon: 0.0001
+    beta1: 0.9
+    beta2: 0.999
+
+    # RandomSearchPricer parameters    
+    n_search: 100

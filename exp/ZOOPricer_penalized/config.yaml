@@ -1,0 +1,67 @@
+random_seed: 42
+data_dir: '../data/'
+exp_dir: '../exp/'
+exp_name: 'ZOOPricer_penalized'
+model_dir: '../trained_model/'
+model_name: optuna_lightgbm
+reuse_model: True
+
+data:
+  train:
+    prices_decisions: 'train_prices_decisions.csv'
+    covariate: 'train_covariate'
+    noisy_embedding: 'train_noisy_embedding'
+    item0embedding: 'item0embedding'
+    item1embedding: 'item1embedding'
+  test:
+    covariate: 'test_covariate_compatible'
+    noisy_embedding: 'test_noisy_embedding_compatible'
+
+  
+preprocess:
+  valid_size: 0.15
+  preprocessor: KNN_Preprocessor
+  param:
+    n_neighbors: 20
+    weights: distance
+    
+strategy: BaseStrategy
+
+train:
+  fold: 5
+  model: lightGBM_FocalLoss
+  param:
+    n_process: 1
+    alpha: 0.75
+    gamma: 2
+  fit_params:
+    metric: focal_loss
+    verbosity: -1
+    num_leaves: 70
+    n_estimators: 180
+    boosting_type: gbdt
+
+valid:
+  pricer: ZOOPricer
+  param:
+    metric: 'penalized' # 'hard', 'soft', 'penalized'
+    max_epoch: 30
+    price0:
+      min: 0.0000415
+      max: 2.2222
+    price1:
+      min: 0.00024
+      max: 3.99964
+
+    # BestStepPricer parameters
+    step: 0.2
+    lambda_: 0.95
+
+    # ZOOPricer parameters
+    lr: 0.1
+    epsilon: 0.0001
+    beta1: 0.9
+    beta2: 0.999
+
+    # RandomSearchPricer parameters    
+    n_search: 100
