@@ -1,0 +1,53 @@
+random_seed: 42
+exp_dir: '../exp/'
+data_dir: '../data/'
+exp_name: 'Random'
+
+data:
+  train:
+    prices_decisions: 'train_prices_decisions.csv'
+    covariate: 'train_covariate'
+    noisy_embedding: 'train_noisy_embedding'
+    item0embedding: 'item0embedding'
+    item1embedding: 'item1embedding'
+  test:
+    covariate: 'test_covariate_compatible'
+    noisy_embedding: 'test_noisy_embedding_compatible'
+
+  
+preprocess:
+  valid_size: 0.15
+  preprocessor: KNN_Preprocessor
+  param:
+    n_neighbors: 20
+    weights: distance
+    
+strategy: BaseStrategy
+
+train:
+  fold: 5
+  model: lightGBM_FocalLoss
+  param:
+    n_process: 1
+    alpha: 0.75
+    gamma: 2
+  fit_params:
+    num_leaves: 70
+    n_estimators: 180
+    boosting_type: dart
+
+valid:
+  pricer: RandomPricer
+  param:
+    # step: 0.2
+    # lambda_: 0.95
+    lr: 0.01
+    epsilon: 0.001
+    max_epoch: 50
+    n_search: 100
+    price0:
+      min: 0.0000415
+      max: 2.2222
+    price1:
+      min: 0.00024
+      max: 3.99964

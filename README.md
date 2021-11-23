@@ -1,4 +1,14 @@
 # Pricing-Optimization
+
+## Environment
+```bash=
+pip install -r requirements.txt
+```
+or
+```bash=
+conda create --name <env_name> --file requirements.txt
+conda activate <env_name>
+```
 ## Usage
 ```python=
 python src/main.py -c config.yaml
@@ -14,6 +24,7 @@ To experiment with new solutions, add a new class in ```strategies.py```, ```mod
 
 After you define your strategy/preprocessor/model, change the name of those modules in ```config.yaml``` and run with that configuration file
 ```python=
+python src/preprocess.py -c config.yaml
 python src/main.py -c config.yaml
 ```
 

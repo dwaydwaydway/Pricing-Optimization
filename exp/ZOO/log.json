@@ -1,0 +1,64 @@
+{
+    "Training Log": {
+        "Fold 0": {
+            "Train": {
+                "Negative Log Likelihood": 0.426895867861307,
+                "Accuracy": 0.9727941176470588
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.5046308897912996,
+                "Accuracy": 0.8710084033613446
+            }
+        },
+        "Fold 1": {
+            "Train": {
+                "Negative Log Likelihood": 0.42643635116496026,
+                "Accuracy": 0.9724789915966386
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.5046510932752144,
+                "Accuracy": 0.8659663865546219
+            }
+        },
+        "Fold 2": {
+            "Train": {
+                "Negative Log Likelihood": 0.42363814103181757,
+                "Accuracy": 0.9732142857142857
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.5189641013147404,
+                "Accuracy": 0.8554621848739495
+            }
+        },
+        "Fold 3": {
+            "Train": {
+                "Negative Log Likelihood": 0.42277327818028065,
+                "Accuracy": 0.9714285714285714
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.5142269603515784,
+                "Accuracy": 0.8659663865546219
+            }
+        },
+        "Fold 4": {
+            "Train": {
+                "Negative Log Likelihood": 0.41847055876342715,
+                "Accuracy": 0.9732142857142857
+            },
+            "Valid": {
+                "Negative Log Likelihood": 0.5260094005566257,
+                "Accuracy": 0.8432773109243697
+            }
+        },
+        "Time": 28.27833867073059
+    },
+    "Validation Log": {
+        "Average Revenue Provided": 0.6156153108090089,
+        "Expected Average Revenue": 1.167463376604428,
+        "Time": 240.30172562599182
+    },
+    "Testing Log": {
+        "Expected Average Revenue": 1.1662229359240173,
+        "Time": 335.33005380630493
+    }
+}
