@@ -11,6 +11,7 @@ conda activate <env_name>
 ```
 ## Usage
 ```python=
+python src/preprocess.py -c config.yaml
 python src/main.py -c config.yaml
 ```
 ## Code
