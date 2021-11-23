@@ -51,10 +51,12 @@ class OneVsRestLightGBMWithCustomizedLoss:
             if 'eval_set' in fit_params:
                 val = lgb.Dataset(X_val, y_val, init_score=np.full_like(y_val, init_score_value, dtype=float),
                                   reference=fit, free_raw_data=False)
-                estimator = lgb.train(params=fit_params,
+                local_fit_params = {k:v for k, v in fit_params.items() if k != 'eval_set'}
+                estimator = lgb.train(params=local_fit_params,
                                       train_set=fit,
                                       valid_sets=(fit, val),
                                       valid_names=('fit', 'val'),
+                                      num_boost_round=200,
                                       early_stopping_rounds=10,
                                       fobj=self.loss.lgb_obj,
                                       feval=self.loss.lgb_eval,
@@ -69,7 +71,6 @@ class OneVsRestLightGBMWithCustomizedLoss:
         return estimator, init_score_value
 
     def predict(self, X):
-
         n_samples = X.shape[0]
         maxima = np.empty(n_samples, dtype=float)
         maxima.fill(-np.inf)

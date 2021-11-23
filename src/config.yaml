@@ -1,7 +1,7 @@
 random_seed: 42
 exp_dir: '../exp/'
 data_dir: '../data/'
-exp_name: 'test2'
+exp_name: 'ZOO'
 
 data:
   train:
@@ -19,23 +19,33 @@ preprocess:
   valid_size: 0.15
   preprocessor: KNN_Preprocessor
   param:
-    n_neighbors: 10
+    n_neighbors: 20
+    weights: distance
     
-
 strategy: BaseStrategy
 
 train:
-  price_range: []
   fold: 5
   model: lightGBM_FocalLoss
   param:
     n_process: 1
     alpha: 0.75
     gamma: 2
+  fit_params:
+    num_leaves: 70
+    n_estimators: 180
+    boosting_type: dart
 
 valid:
-  pricer: RandomPricer
+  pricer: ZOOPricer
   param:
+    # step: 0.2
+    # lambda_: 0.95
+    lr: 0.1
+    epsilon: 0.0001
+    beta1: 0.9
+    beta2: 0.999
+    max_epoch: 30
     n_search: 100
     price0:
       min: 0.0000415

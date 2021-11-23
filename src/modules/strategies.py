@@ -1,15 +1,18 @@
+import time
+import pickle as pkl
 from pathlib import Path
 from tqdm import tqdm
 
 import numpy as np
-import pickle as pkl
+import pandas as pd
+from sklearn.model_selection import KFold
+
 import modules.utils as utils
 import modules.preprocessors as preprocessors
 import modules.models as models
 import modules.pricers as pricers
 from modules.logger import create_logger
 
-from sklearn.model_selection import KFold
 
 class Strategy:
     """
@@ -19,13 +22,15 @@ class Strategy:
 
     def __init__(self, config):
         self.config = config
-        self.train_data, self.valid_data = {}, {}
+        self.train_data, self.valid_data, self.test_data = {}, {}, {}
         data_dir = Path(config.data_dir)
         for cat in ['X', 'Y']:
             with open(data_dir / f"{cat}_train.pkl" , 'rb') as dataFile:
                 self.train_data[cat] = pkl.load(dataFile)
             with open(data_dir / f"{cat}_valid.pkl" , 'rb') as dataFile:
                 self.valid_data[cat] = pkl.load(dataFile)
+        with open(data_dir / f"X_test.pkl" , 'rb') as dataFile:
+            self.test_data['X'] = pkl.load(dataFile)
             
         self.model = getattr(models, self.config.train.model)(
             param=config.train.param
@@ -43,7 +48,6 @@ class Strategy:
             function : A function that takes a list, applies `fn` to each element, and returns a
             new list
         """
-
         raise NotImplementedError(f"train function not implemented for {self.__class__.__name__}")
     
     def test(self, *args, **kwargs):
@@ -63,10 +67,11 @@ class BaseStrategy(Strategy):
             leave=False,
             position=0)
 
-        keys = ['FOLD', 'NLL LOSS', 'ACC']
+        keys = ['SPLIT', 'FOLD', 'NLL', 'ACC']
         eval_bar.write(utils.getTimeStr() + ''.join(f"{key:>10}" for key in keys))
         
-        log = []
+        log = {}
+        start_time = time.time()
         for i, (train_index, test_index) in enumerate(eval_bar):
             big_fold = {
                 'X': self.train_data['X'][train_index], 
@@ -77,18 +82,31 @@ class BaseStrategy(Strategy):
                 'Y': self.train_data['Y'][test_index]
             }
 
-            self.model.fit(big_fold)
-            proba = self.model.predict_proba(small_fold)
-            log_loss = utils.NLLLoss(proba, small_fold['Y'])
-            acc = utils.Accuracy(proba, small_fold['Y'])
+            self.model.fit(big_fold, self.config.train.fit_params)
 
-            eval_bar.write(utils.getTimeStr() + ''.join(f"{key:>10.3f}" for key in [i, log_loss, acc]))
-            log.append({f"Fold {i}": {'Negative Log Likelihood': log_loss, \
-                                      'Accuracy': acc}})
+            train_proba = self.model.predict_proba(big_fold)
+            valid_proba = self.model.predict_proba(small_fold)
+            train_nllLoss = utils.NLLLoss(train_proba, big_fold['Y'])
+            valid_nllLoss = utils.NLLLoss(valid_proba, small_fold['Y'])
+            train_acc = utils.Accuracy(train_proba, big_fold['Y'])
+            valid_acc = utils.Accuracy(valid_proba, small_fold['Y'])
+
+            eval_bar.write(utils.getTimeStr() + '     TRAIN' + ''.join(f"{key:>10.3f}" for key in [i, train_nllLoss, train_acc]))
+            eval_bar.write(utils.getTimeStr() + '     VALID' + ''.join(f"{key:>10.3f}" for key in [i, valid_nllLoss, valid_acc]))
+            log[f"Fold {i}"] = {'Train':
+                                    {'Negative Log Likelihood': train_nllLoss, \
+                                    'Accuracy': train_acc},
+                               'Valid':
+                                    {'Negative Log Likelihood': valid_nllLoss, \
+                                    'Accuracy': valid_acc}
+                            }
+        end_time = time.time()
 
         self.logger.info(f'[*] Training with all data')
-        self.model.fit(self.train_data)
-        
+        self.model.fit(self.train_data, self.config.train.fit_params)
+
+        log['Time'] = end_time - start_time
+
         return log
 
     def valid(self):
@@ -98,21 +116,37 @@ class BaseStrategy(Strategy):
                 provided_revenue += x[-2]
             elif y == 2:
                 provided_revenue += x[-1]
-        provided_revenue /= len(self.valid_data["X"])
-        self.logger.info(f'[-] Average Revenue Provided: {provided_revenue:2.3f}')
+        
+        self.logger.info(f'[-] Average Revenue Provided: {provided_revenue / len(self.valid_data["X"]):2.3f}')
 
         self.pricer = getattr(pricers, self.config.valid.pricer)(
             param=self.config.valid.param
         )
-
+        start_time = time.time()
         expected_revenue, predicted_prices = self.pricer.run(self.model, self.valid_data)            
-        
-        self.logger.info(f'[-] Expected Average Revenue: {expected_revenue}')
+        end_time = time.time()
 
-        return {'Average Revenue Provided': provided_revenue, 
-                'Expected Average Revenue': expected_revenue}
+        self.logger.info(f'[-] [VALID] Expected Average Revenue: {sum(expected_revenue) / len(expected_revenue):2.3f}')
 
-    def test(self, x):
-        pass
+        return {'Average Revenue Provided': provided_revenue / len(self.valid_data["X"]), 
+                'Expected Average Revenue': sum(expected_revenue) / len(expected_revenue), 
+                'Time': end_time - start_time}
+
+    def test(self):
+        start_time = time.time()
+        expected_revenue, predicted_prices = self.pricer.run(self.model, self.test_data)
+        end_time = time.time()
+
+        output = {'user_index': list(range(14000, 14000+2912)), 
+                  'price_item_0': np.array([price[0] for price in predicted_prices], dtype=np.float32), 
+                  'price_item_1': np.array([price[1] for price in predicted_prices], dtype=np.float32), 
+                  'expected_revenue': np.array(expected_revenue, dtype=np.float32)
+        }
+
+        self.logger.info(f'[-] [TEST] Expected Average Revenue: {sum(expected_revenue) / len(expected_revenue):2.3f}')
+
+        output = pd.DataFrame(output)
+        return output, {'Expected Average Revenue': sum(expected_revenue) / len(expected_revenue), 
+                        'Time': end_time - start_time}
 
     

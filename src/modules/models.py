@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from modules.custom_model import OneVsRestLightGBMWithCustomizedLoss, FocalLoss
+from sklearn.model_selection import train_test_split
 
 class Models:
     def __init__(self, param):
@@ -27,12 +28,14 @@ class Logistic_Regression(Models):
 class lightGBM_FocalLoss(Models):
     def __init__(self, param):
         super().__init__(param)
-        # Instantiate Focal loss
         self.loss = FocalLoss(alpha=self.alpha, gamma=self.gamma)
 
-    def fit(self, data):
+    def fit(self, data, fit_params):
+        X_train, X_valid, Y_train, Y_valid = train_test_split(data['X'], data['Y'], \
+                                                                test_size=0.15)
         self.model = OneVsRestLightGBMWithCustomizedLoss(loss=self.loss, n_jobs=self.n_process)
-        self.model.fit(data['X'], data['Y'])
+        fit_params['eval_set'] = [(X_valid, Y_valid)]
+        self.model.fit(X_train, Y_train, **fit_params)
     
     def predict_proba(self, data):
         return self.model.predict_proba(data['X'])

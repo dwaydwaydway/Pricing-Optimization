@@ -20,7 +20,7 @@ class KNN_Preprocessor(Preprocessor):
         index_pred = np.array([i for i in range(1, len(data['covariate'])+1) if i not in index_provided])
         X, Y = data['covariate'].iloc[index_provided-1], data['noisy_embedding']
         if mode == 'train':
-            self.neigh = KNeighborsRegressor(n_neighbors=self.n_neighbors)
+            self.neigh = KNeighborsRegressor(n_neighbors=self.n_neighbors, weights=self.weights)
             self.neigh.fit(X, Y)
         prediction = self.neigh.predict(data['covariate'].iloc[index_pred-1])
         data['noisy_embedding'] = data['noisy_embedding'].append(pd.DataFrame(prediction, columns=data['noisy_embedding'].columns, index=index_pred))

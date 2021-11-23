@@ -5,6 +5,7 @@ import random
 import sys
 import ipdb
 import json
+import warnings
 
 from box import Box
 from pathlib import Path
@@ -23,9 +24,11 @@ def parse_args():
 
 def main(config_path):
     config = Box.from_yaml(config_path.open())
+    warnings.filterwarnings("ignore", category=UserWarning)
 
     logger = create_logger(name="MAIN")
     logger.info(f'[-] Config loaded from {config_path}')
+    logger.info(f'[-] Running Experiment {config.exp_name}')
 
     # Set seeds
     random.seed(config.random_seed)
@@ -47,14 +50,15 @@ def main(config_path):
     logger.info('[*] Start Validating...')
     valid_log = strategy.valid()
 
-    with open(exp_path / "log.json", 'w') as f:
-        f.write(json.dumps({'Training Log': train_log}, indent=4) + "\n")
-        f.write(json.dumps({'Validation Log': valid_log}, indent=4) + "\n")
-            
-    logger.info(f'[+] Experiment log dumped at {exp_path / "log.json"}')
-
     logger.info('[*] Start Testing...')
-    # strategy.test()
+    output, test_log = strategy.test()
+    output.to_csv(exp_path / "prediction.csv")
+    
+    with open(exp_path / "log.json", 'w') as f:
+        log = {'Training Log': train_log, 'Validation Log': valid_log, 'Testing Log': test_log}
+        f.write(json.dumps(log, indent=4) + "\n")
+
+    logger.info(f'[+] Experiment log dumped at {exp_path / "log.json"}')
 
 if __name__ == "__main__":
     with ipdb.launch_ipdb_on_exception():
