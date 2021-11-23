@@ -45,6 +45,7 @@ valid:
   pricer: ZOOPricer
   param:
     metric: 'hard' # 'hard', 'soft', 'penalized'
+    alpha: 1
     max_epoch: 30
     price0:
       min: 0.0000415
