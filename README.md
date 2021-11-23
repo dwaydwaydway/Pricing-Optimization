@@ -17,11 +17,12 @@ python src/main.py -c config.yaml
 ## Code
 ### Everything can be configured in ```config.yaml```
 
-To experiment with new solutions, add a new class in ```strategies.py```, ```models.py``` or ```preprocessors.py```
+To experiment with new solutions, add a new class in ```preprocessors.py```, ```strategies.py```, ```models.py``` or ```pricer.py```
 
  - A strategy class should define who the high-level of our algorithm runs
  - A preprocessor class should define how to acquire the embeddings for the cold-starting users
  - A model class should define how the predictions are made
+ - A pricer class should define how the to acquire the prices that optimize the revenue
 
 After you define your strategy/preprocessor/model, change the name of those modules in ```config.yaml``` and run with that configuration file
 ```python=
