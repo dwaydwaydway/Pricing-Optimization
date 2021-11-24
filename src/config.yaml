@@ -1,10 +1,9 @@
 random_seed: 42
 data_dir: '../data/'
 exp_dir: '../exp/'
-exp_name: 'get optuna model'
+exp_name: 'BestStepPricer_alpha_1'
 model_dir: '../trained_model/'
 model_name: optuna_lightgbm
-reuse_model: False
 
 data:
   train:

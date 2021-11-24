@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from tqdm import tqdm
 
 class Pricer:
@@ -10,7 +11,7 @@ class Pricer:
         proba = model.predict_proba({'X': np.array([x])})
         revenues = {}
         revenues['soft'] = (proba[0][1] * x[-2] + proba[0][2] * x[-1])
-        revenues['penalized'] = revenues['soft']  * (self.alpha / (proba[0][0]+1e-08))
+        revenues['penalized'] = revenues['soft']  / math.exp(self.alpha * (proba[0][0]+1e-08))
         revenues['hard']  = 0
         if np.argmax(proba) == 1:
             revenues['hard'] += x[-2]
