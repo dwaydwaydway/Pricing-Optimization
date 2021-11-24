@@ -148,7 +148,7 @@ class BaseStrategy(Strategy):
         predicted_prices, expected_hard_revenue, expected_soft_revenue, expected_penalized_revenue = self.pricer.run(self.model, self.test_data)
         end_time = time.time()
 
-        output = {'user_index': list(range(14000, 14000+2912)), 
+        output = {'user_index': list(range(14001, 14001+2912)), 
                   'price_item_0': np.array([price[0] for price in predicted_prices], dtype=np.float32), 
                   'price_item_1': np.array([price[1] for price in predicted_prices], dtype=np.float32), 
                   'expected_revenue': np.array(expected_soft_revenue, dtype=np.float32)
@@ -159,7 +159,7 @@ class BaseStrategy(Strategy):
         self.logger.info(f'[-] [TEST] Expected Average Penalized Revenue: {sum(expected_penalized_revenue) / len(expected_penalized_revenue):2.3f}')
 
 
-        output = pd.DataFrame(output)
+        output = pd.DataFrame(output, index=None)
         return output, {'Expected Average Hard Revenue': sum(expected_hard_revenue) / len(expected_hard_revenue), 
                         'Expected Average Soft Revenue': sum(expected_soft_revenue) / len(expected_soft_revenue), 
                         'Expected Average Penalized Revenue': sum(expected_penalized_revenue) / len(expected_penalized_revenue), 

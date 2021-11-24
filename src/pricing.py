@@ -58,7 +58,7 @@ def main(config_path):
     
     logger.info('[*] Start Testing...')
     output, test_log = strategy.test()
-    output.to_csv(exp_path / "prediction.csv")
+    output.to_csv(exp_path / "prediction.csv", index=False)
     
     with open(exp_path / "log.json", 'w') as f:
         log = {'Testing Log': test_log}
