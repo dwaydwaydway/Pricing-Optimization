@@ -1,8 +1,8 @@
 {
     "Testing Log": {
-        "Expected Average Hard Revenue": 0.7299194792545348,
-        "Expected Average Soft Revenue": 0.6637809955508361,
-        "Expected Average Penalized Revenue": 27.722841731518386,
-        "Time": 153.90279984474182
+        "Expected Average Hard Revenue": 1.1187787505896207,
+        "Expected Average Soft Revenue": 1.0836733905153397,
+        "Expected Average Penalized Revenue": 0.9521705170468122,
+        "Time": 140.69690823554993
     }
 }
