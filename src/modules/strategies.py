@@ -8,27 +8,19 @@ import pandas as pd
 from sklearn.model_selection import KFold
 
 import modules.utils as utils
-import modules.preprocessors as preprocessors
 import modules.models as models
 import modules.pricers as pricers
 from modules.logger import create_logger
 
 
 class Strategy:
-    """
-    Modules form a tree that store parameters and other
-    submodules. They make up the basis of neural network stacks.
-    """
-
     def __init__(self, config):
         self.config = config
-        self.train_data, self.valid_data, self.test_data = {}, {}, {}
+        self.train_data, self.test_data = {}, {}
         data_dir = Path(config.data_dir)
         for cat in ['X', 'Y']:
             with open(data_dir / f"{cat}_train.pkl" , 'rb') as dataFile:
                 self.train_data[cat] = pkl.load(dataFile)
-            with open(data_dir / f"{cat}_valid.pkl" , 'rb') as dataFile:
-                self.valid_data[cat] = pkl.load(dataFile)
         with open(data_dir / f"X_test.pkl" , 'rb') as dataFile:
             self.test_data['X'] = pkl.load(dataFile)
             
@@ -38,16 +30,6 @@ class Strategy:
         self.logger = create_logger(name="STRATEGY")
 
     def train(self, *args, **kwargs):
-        """
-        Higher-order map.
-        .. image:: figs/Ops/maplist.png
-        See `<https://en.wikipedia.org/wiki/Map_(higher-order_function)>`_
-        Args:
-            fn (one-arg function): Function from one value to one value.
-        Returns:
-            function : A function that takes a list, applies `fn` to each element, and returns a
-            new list
-        """
         raise NotImplementedError(f"train function not implemented for {self.__class__.__name__}")
     
     def test(self, *args, **kwargs):
@@ -74,14 +56,14 @@ class BaseStrategy(Strategy):
         
         log = {}
         start_time = time.time()
-        for i, (train_index, test_index) in enumerate(eval_bar):
+        for i, (train_index, valid_index) in enumerate(eval_bar):
             big_fold = {
                 'X': self.train_data['X'][train_index], 
                 'Y': self.train_data['Y'][train_index]
             }
             small_fold = {
-                'X': self.train_data['X'][test_index], 
-                'Y': self.train_data['Y'][test_index]
+                'X': self.train_data['X'][valid_index], 
+                'Y': self.train_data['Y'][valid_index]
             }
             self.model.fit(big_fold, self.config.train.fit_params)
 
@@ -104,6 +86,8 @@ class BaseStrategy(Strategy):
                     'Accuracy': valid_acc
                 }
             }
+            self.model.reset()
+
         end_time = time.time()
 
         self.logger.info(f'[*] Training with all data')
@@ -113,39 +97,13 @@ class BaseStrategy(Strategy):
 
         return self.model, log
 
-    def valid(self):
-        provided_revenue = 0
-        for (x, y) in zip(self.valid_data["X"], self.valid_data["Y"]):
-            if y == 1:
-                provided_revenue += x[-2]
-            elif y == 2:
-                provided_revenue += x[-1]
-        
-        self.logger.info(f'[-] Average Revenue Provided: {provided_revenue / len(self.valid_data["X"]):2.3f}')
-
-        self.pricer = getattr(pricers, self.config.valid.pricer)(
-            param=self.config.valid.param
-        )
-        start_time = time.time()
-        predicted_prices, expected_hard_revenue, expected_soft_revenue, expected_penalized_revenue = self.pricer.run(self.model, self.valid_data)            
-        end_time = time.time()
-
-        self.logger.info(f'[-] [VALID] Expected Average Hard Revenue: {sum(expected_hard_revenue) / len(expected_hard_revenue):2.3f}')
-        self.logger.info(f'[-] [VALID] Expected Average Soft Revenue: {sum(expected_soft_revenue) / len(expected_soft_revenue):2.3f}')
-        self.logger.info(f'[-] [VALID] Expected Average Penalized Revenue: {sum(expected_penalized_revenue) / len(expected_penalized_revenue):2.3f}')
-
-        return {'Average Revenue Provided': provided_revenue / len(self.valid_data["X"]), 
-                'Expected Average Hard Revenue': sum(expected_hard_revenue) / len(expected_hard_revenue), 
-                'Expected Average Soft Revenue': sum(expected_soft_revenue) / len(expected_soft_revenue), 
-                'Expected Average Penalized Revenue': sum(expected_penalized_revenue) / len(expected_penalized_revenue), 
-                'Time': end_time - start_time}
-
     def test(self):
-        self.pricer = getattr(pricers, self.config.valid.pricer)(
-            param=self.config.valid.param
+        self.pricer = getattr(pricers, self.config.test.pricer)(
+            param=self.config.test.param
         )
         start_time = time.time()
-        predicted_prices, expected_hard_revenue, expected_soft_revenue, expected_penalized_revenue = self.pricer.run(self.model, self.test_data)
+        predicted_prices, expected_hard_revenue, expected_soft_revenue, expected_penalized_revenue = \
+            self.pricer.run(self.model, self.test_data)
         end_time = time.time()
 
         output = {'user_index': list(range(14001, 14001+2912)), 

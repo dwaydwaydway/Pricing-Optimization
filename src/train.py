@@ -51,11 +51,8 @@ def main(config_path):
         pkl.dump(model, handle)
     logger.info(f'[+] Model dumped at {model_path / "model"}')
 
-    logger.info('[*] Start Validating...')
-    valid_log = strategy.valid()
-
     with open(model_path / f"log.json", 'w') as f:
-        log = {'Traning Log': train_log, 'Validation Log': valid_log}
+        log = {'Traning Log': train_log}
         f.write(json.dumps(log, indent=4) + "\n")
     logger.info(f'[+] Training/Validation Log dumped at {model_path / f"log.json"}')
 

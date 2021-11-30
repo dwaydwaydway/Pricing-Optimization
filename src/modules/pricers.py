@@ -22,6 +22,50 @@ class Pricer:
     def run(self, model, data):
         raise NotImplementedError(f"run function not implemented for {self.__class__.__name__}")
 
+class BruteForcePricer(Pricer):
+    def __init__(self, param):
+        super().__init__(param)
+
+    def run(self, model, data):
+        progress_bar = tqdm(
+            data['X'],
+            total=len(data['X']),
+            desc='[BF_PRICEING]',
+            leave=False,
+            position=0)
+
+        expected_hard_revenue, expected_soft_revenue, expected_penalized_revenue, predicted_prices = [], [], [], []
+        for i, x in enumerate(progress_bar):
+            max_hard_revenue, max_soft_revenue, max_penalized_revenue = float('-inf'), float('-inf'), float('-inf')
+            best_prices = [self.price0.min, self.price1.min]
+            price0 = self.price0.min
+            while price0 < self.price0.max:
+                price1 = self.price1.min
+                while price1 < self.price1.max:
+                    x[-2], x[-1] = price0, price1
+                    revenues = self.get_revenue(model, x)
+                    if (self.metric == 'hard' and revenues['hard'] > max_hard_revenue)\
+                        or (self.metric == 'soft' and revenues['soft'] > max_soft_revenue) \
+                        or (self.metric == 'penalized' and revenues['penalized'] > max_penalized_revenue):
+                        best_prices = (price0, price1)
+                        max_hard_revenue = revenues['hard']
+                        max_soft_revenue = revenues['soft']
+                        max_penalized_revenue = revenues['penalized']
+                    price1 += self.interval
+                price0 += self.interval
+            
+            predicted_prices.append(best_prices)
+            expected_hard_revenue.append(max(max_hard_revenue, 0))
+            expected_soft_revenue.append(max(max_soft_revenue, 0))
+            expected_penalized_revenue.append(max(max_penalized_revenue, 0))
+            postfix = [f'[AVG Hard Revenue: {sum(expected_hard_revenue)/(i+1):2.2f}]', \
+                      f'[AVG Soft Revenue: {sum(expected_soft_revenue)/(i+1):2.2f}]', \
+                      f'[AVG Penalized Revenue: {sum(expected_penalized_revenue)/(i+1):2.2f}]']
+            progress_bar.set_postfix_str(''.join(postfix))
+
+        return predicted_prices, expected_hard_revenue, expected_soft_revenue, expected_penalized_revenue
+
+
 class RandomSearchPricer(Pricer):
     def __init__(self, param):
         super().__init__(param)
@@ -77,7 +121,7 @@ class BestStepPricer(Pricer):
         progress_bar = tqdm(
             data['X'],
             total=len(data['X']),
-            desc='[ZOO_PRICEING]',
+            desc='[BESTSTEP_PRICEING]',
             leave=False,
             position=0)
 
