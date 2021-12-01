@@ -1,10 +1,10 @@
+exp_name: 'BruteForcePricer_hard'
+model_name: optuna_lightgbm
+
 random_seed: 42
 data_dir: '../data/'
 exp_dir: '../exp/'
-exp_name: 'BestStepPricer_hard'
 model_dir: '../trained_model/'
-model_name: optuna_lightgbm
-reuse_model: True
 
 data:
   train:
@@ -42,17 +42,20 @@ train:
     boosting_type: gbdt
 
 test:
-  pricer: BestStepPricer
+  pricer: BruteForcePricer 
   param:
     metric: 'hard' # 'hard', 'soft', 'penalized'
     alpha: 1
-    max_epoch: 150
+    max_epoch: 30
     price0:
       min: 0.0000415
       max: 2.2222
     price1:
       min: 0.00024
       max: 3.99964
+    
+    # BruteForcePricer parameters
+    interval: 0.01
 
     # BestStepPricer parameters
     step: 0.2
@@ -65,4 +68,4 @@ test:
     beta2: 0.999
 
     # RandomSearchPricer parameters    
-    n_search: 100
+    n_search: 5000

@@ -19,8 +19,8 @@ data:
 
   
 preprocess:
-  valid_size: 0.15
-  preprocessor: KNN_Preprocessor
+  regressor: KNN_Regressor
+  vectors: concat # [concat, dot]
   param:
     n_neighbors: 20
     weights: distance
@@ -41,7 +41,7 @@ train:
     n_estimators: 180
     boosting_type: gbdt
 
-valid:
+test:
   pricer: RandomSearchPricer
   param:
     metric: 'penalized' # 'hard', 'soft', 'penalized'
@@ -65,4 +65,4 @@ valid:
     beta2: 0.999
 
     # RandomSearchPricer parameters    
-    n_search: 100
+    n_search: 700

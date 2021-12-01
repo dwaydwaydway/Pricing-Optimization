@@ -2,60 +2,54 @@
     "Traning Log": {
         "Fold 0": {
             "Train": {
-                "Negative Log Likelihood": 0.4685965861652116,
-                "Accuracy": 0.9186974789915966
+                "Negative Log Likelihood": 0.5006516224722826,
+                "Accuracy": 0.9166071428571428
             },
             "Valid": {
-                "Negative Log Likelihood": 0.4968395731836811,
-                "Accuracy": 0.8823529411764706
+                "Negative Log Likelihood": 0.5283962371209875,
+                "Accuracy": 0.8746428571428572
             }
         },
         "Fold 1": {
             "Train": {
-                "Negative Log Likelihood": 0.4805003289571974,
-                "Accuracy": 0.9243697478991597
+                "Negative Log Likelihood": 0.46724795677220404,
+                "Accuracy": 0.928125
             },
             "Valid": {
-                "Negative Log Likelihood": 0.5115008948188744,
-                "Accuracy": 0.8802521008403361
+                "Negative Log Likelihood": 0.5070464368084627,
+                "Accuracy": 0.8767857142857143
             }
         },
         "Fold 2": {
             "Train": {
-                "Negative Log Likelihood": 0.48157289087541794,
-                "Accuracy": 0.9212184873949579
+                "Negative Log Likelihood": 0.4870019007183363,
+                "Accuracy": 0.9088392857142857
             },
             "Valid": {
-                "Negative Log Likelihood": 0.5225938170235986,
-                "Accuracy": 0.8701680672268908
+                "Negative Log Likelihood": 0.522482848106741,
+                "Accuracy": 0.8710714285714286
             }
         },
         "Fold 3": {
             "Train": {
-                "Negative Log Likelihood": 0.5012696001626435,
-                "Accuracy": 0.9204831932773109
+                "Negative Log Likelihood": 0.49223637072768134,
+                "Accuracy": 0.9166071428571428
             },
             "Valid": {
-                "Negative Log Likelihood": 0.5387424068163768,
-                "Accuracy": 0.8726890756302521
+                "Negative Log Likelihood": 0.5237113999345704,
+                "Accuracy": 0.8667857142857143
             }
         },
         "Fold 4": {
             "Train": {
-                "Negative Log Likelihood": 0.46963059830294496,
-                "Accuracy": 0.9203781512605042
+                "Negative Log Likelihood": 0.46221179704506377,
+                "Accuracy": 0.9366071428571429
             },
             "Valid": {
-                "Negative Log Likelihood": 0.5150769049523233,
-                "Accuracy": 0.8516806722689075
+                "Negative Log Likelihood": 0.5198527147911138,
+                "Accuracy": 0.8682142857142857
             }
         },
-        "Time": 1343.5741248130798
-    },
-    "Validation Log": {
-        "Average Revenue Provided": 0.6156153108090089,
-        "Expected Average Revenue": 0.8382761677217209,
-        "Expected Average Penalized Revenue": 30.740660213168812,
-        "Time": 129.8559694290161
+        "Time": 1024.60023021698
     }
 }

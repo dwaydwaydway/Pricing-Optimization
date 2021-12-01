@@ -19,8 +19,8 @@ data:
 
   
 preprocess:
-  valid_size: 0.15
-  preprocessor: KNN_Preprocessor
+  regressor: KNN_Regressor
+  vectors: concat # [concat, dot]
   param:
     n_neighbors: 20
     weights: distance
@@ -41,12 +41,12 @@ train:
     n_estimators: 180
     boosting_type: gbdt
 
-valid:
+test:
   pricer: ZOOPricer
   param:
     metric: 'penalized' # 'hard', 'soft', 'penalized'
     alpha: 1
-    max_epoch: 30
+    max_epoch: 150
     price0:
       min: 0.0000415
       max: 2.2222

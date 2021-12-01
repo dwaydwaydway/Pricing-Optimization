@@ -1,10 +1,10 @@
+exp_name: 'BruteForcePricer_penalized'
+model_name: optuna_lightgbm
+
 random_seed: 42
 data_dir: '../data/'
 exp_dir: '../exp/'
-exp_name: 'BestStepPricer_penalized'
 model_dir: '../trained_model/'
-model_name: optuna_lightgbm
-reuse_model: True
 
 data:
   train:
@@ -19,8 +19,8 @@ data:
 
   
 preprocess:
-  valid_size: 0.15
-  preprocessor: KNN_Preprocessor
+  regressor: KNN_Regressor
+  vectors: concat # [concat, dot]
   param:
     n_neighbors: 20
     weights: distance
@@ -41,8 +41,8 @@ train:
     n_estimators: 180
     boosting_type: gbdt
 
-valid:
-  pricer: BestStepPricer
+test:
+  pricer: BruteForcePricer 
   param:
     metric: 'penalized' # 'hard', 'soft', 'penalized'
     alpha: 1
@@ -53,6 +53,9 @@ valid:
     price1:
       min: 0.00024
       max: 3.99964
+    
+    # BruteForcePricer parameters
+    interval: 0.005
 
     # BestStepPricer parameters
     step: 0.2
@@ -65,4 +68,4 @@ valid:
     beta2: 0.999
 
     # RandomSearchPricer parameters    
-    n_search: 100
+    n_search: 5000

@@ -1,10 +1,10 @@
+exp_name: 'RandomSeaerchSoft5000'
+model_name: optuna_lightgbm
+
 random_seed: 42
 data_dir: '../data/'
 exp_dir: '../exp/'
-exp_name: 'BestStepPricer_hard'
 model_dir: '../trained_model/'
-model_name: optuna_lightgbm
-reuse_model: True
 
 data:
   train:
@@ -19,8 +19,8 @@ data:
 
   
 preprocess:
-  regressor: KNN_Regressor
-  vectors: concat # [concat, dot]
+  valid_size: 0.15
+  preprocessor: KNN_Preprocessor
   param:
     n_neighbors: 20
     weights: distance
@@ -41,12 +41,12 @@ train:
     n_estimators: 180
     boosting_type: gbdt
 
-test:
-  pricer: BestStepPricer
+valid:
+  pricer: RandomSearchPricer 
   param:
-    metric: 'hard' # 'hard', 'soft', 'penalized'
+    metric: 'soft' # 'hard', 'soft', 'penalized'
     alpha: 1
-    max_epoch: 150
+    max_epoch: 30
     price0:
       min: 0.0000415
       max: 2.2222
@@ -65,4 +65,4 @@ test:
     beta2: 0.999
 
     # RandomSearchPricer parameters    
-    n_search: 100
+    n_search: 5000
